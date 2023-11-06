@@ -4,6 +4,7 @@
 // init project
 var express = require('express');
 var app = express();
+var moment = require("moment")
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -23,6 +24,39 @@ app.get("/", function (req, res) {
 app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
+
+const isInvalidDate = (date) => date.toUTCString() === "Invalid Date"
+
+app.get("/api/:dateInput", function(req, res){
+  let dateInput = req.params.dateInput
+  let date = new Date(dateInput)
+
+
+  //if date is invalid, try to convert to int
+  if(isInvalidDate(date)){
+    date = new Date(parseInt(dateInput))
+  }
+
+  //if date is invalid, send error
+  if(isInvalidDate(date)){
+    res.json({error: "Invalid Date"})
+    return
+  } 
+
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  })
+})
+
+
+// this endpoint returns current date
+app.get("/api/", function(req, res){
+  res.json({
+    unix: new Date().getTime(),
+    utc: new Date().toUTCString()
+  })
+})
 
 
 
